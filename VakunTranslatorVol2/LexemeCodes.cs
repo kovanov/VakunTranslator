@@ -2,7 +2,7 @@
 {
     public enum LexemeCodes
     {
-        UNDEFINED = -1,
+        NOTHING = -1,
         PROGRAM = 0,
         FLOAT = 1,
         INT = 2,

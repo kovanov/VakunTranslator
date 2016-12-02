@@ -26,10 +26,9 @@ namespace VakunTranslatorVol2.Analyzers
             Train<LexemeCodes>.OnSuccess = Errors.Clear;
         }
 
-        public void Analyze(List<Lexeme> lexemes, CancellationToken token)
+        public void Analyze(List<Lexeme> lexemes)
         {
             this.lexemes = lexemes;
-            this.token = token;
 
             try
             {
@@ -50,6 +49,7 @@ namespace VakunTranslatorVol2.Analyzers
         {
             if(Train[PROGRAM][ID][LEFT_BRACE][CommandList][RIGHT_BRACE]["program"])
             {
+                Errors.Clear();
                 if(currentIndex < lexemes.Count)
                 {
                     Errors.Add($"Full program, but there is another code after last brace (line {lexemes[currentIndex - 1].Line})");
@@ -58,89 +58,54 @@ namespace VakunTranslatorVol2.Analyzers
         }
         private bool CommandList()
         {
-            return Train[Command][SEMICOLON]["command list"] && Train[Command][SEMICOLON]["command list"].Repeat(() => currentIndex);
+            return Train[Command][SEMICOLON]["command list"] && Train[Command][SEMICOLON]["command list"].Repeat();
         }
         private bool Command()
         {
-            return Train[Operator, Declaration, LabelDeclaration]["command"];
-        }
-        private bool Declaration()
-        {
-            return Train[INT, FLOAT][IdList]["declaration"];
+            return (Train[INT, FLOAT][ID]["command"] && (Train[COMMA][ID]["command"].Repeat())) ||
+                    (Train[LABEL][ID]["label declaration"]) ||
+                    (Train[GOTO][ID]["goto operator"]) ||
+                    (Train[ID][ASSIGN][Expression]["assignment"]) ||
+                    (Train[WRITE][LEFT_PARENTHESIS][IdList][RIGHT_PARENTHESIS]["output"]) ||
+                    (Train[READ][LEFT_PARENTHESIS][ID][RIGHT_PARENTHESIS]["input"]) ||
+                    (Train[IF][LogicalExpression][THEN][Command]["conditional"]) ||
+                    (Train[FOR][ID][ASSIGN][Expression][TO][Expression][BY][Expression][WHILE][LEFT_PARENTHESIS][LogicalExpression][RIGHT_PARENTHESIS][CommandList][END]["loop"]);
         }
         private bool IdList()
         {
-            return Train[ID]["id list"] && Train[COMMA][ID]["id list"].Repeat(() => currentIndex);
-        }
-        private bool LabelDeclaration()
-        {
-            return Train[LABEL][ID]["label declaration"];
-        }
-        private bool Operator()
-        {
-            return Train[Assignment, Loop, Conditional, Input, Output, GotoOperator]["operator"];
-        }
-        private bool GotoOperator()
-        {
-            return Train[GOTO][ID]["goto operator"];
-        }
-        private bool Assignment()
-        {
-            return Train[ID][ASSIGN][Expression]["assignment"];
-        }
-        private bool Output()
-        {
-            return Train[WRITE][LEFT_PARENTHESIS][IdList][RIGHT_PARENTHESIS]["output"];
-        }
-        private bool Input()
-        {
-            return Train[READ][LEFT_PARENTHESIS][ID][RIGHT_PARENTHESIS]["input"];
-        }
-        private bool Conditional()
-        {
-            return Train[IF][Relation][THEN][Command]["conditional"];
-        }
-        private bool Loop()
-        {
-            return Train[FOR][Assignment][TO][Expression][BY][Expression][WHILE][LEFT_PARENTHESIS][Relation][RIGHT_PARENTHESIS][CommandList][END]["loop"];
+            return Train[ID]["id list"] && Train[COMMA][ID]["id list"].Repeat();
         }
         private bool LogicalExpression()
         {
-            return Train[LogicalTerm]["logical expression"] && Train[OR][LogicalTerm]["logical expression"].Repeat(() => currentIndex);
+            return Train[LogicalTerm]["logical expression"] && Train[OR][LogicalTerm]["logical expression"].Repeat();
         }
         private bool LogicalTerm()
         {
-            return Train[LogicalMultiplier]["logical term"] && Train[AND][LogicalMultiplier]["logical term"].Repeat(() => currentIndex);
+            return Train[LogicalMultiplier]["logical term"] && Train[AND][LogicalMultiplier]["logical term"].Repeat();
         }
         private bool LogicalMultiplier()
         {
-            return Train[Relation, () => Train[NOT][LogicalMultiplier]["logical multiplier"], () => Train[LEFT_PARENTHESIS][LogicalExpression][RIGHT_PARENTHESIS]["logical multiplier"]]["logical multiplier"];
+            return Train[LEFT_PARENTHESIS][LogicalExpression][RIGHT_PARENTHESIS]["logical multiplier"]["logical multiplier"] || Train[Relation]["logical multiplier"] || Train[NOT][LogicalMultiplier]["logical multiplier"];
         }
         private bool Relation()
         {
-            return Train[Expression][RelationSign][Expression]["relation"];
-        }
-        private bool RelationSign()
-        {
-            return Train[LESS_THAN, LESS_EQUAL, MORE_THAN, MORE_EQUAL, NOT_EQUAL, EQUAL]["relation sign"];
+            return Train[Expression][LESS_THAN, LESS_EQUAL, MORE_THAN, MORE_EQUAL, NOT_EQUAL, EQUAL][Expression]["relation"];
         }
         private bool Expression()
         {
-            return Train[Term]["expression"] && Train[PLUS, MINUS][Term]["expression"].Repeat(() => currentIndex);
+            return Train[Term]["expression"] && Train[PLUS, MINUS][Term]["expression"].Repeat();
         }
         private bool Term()
         {
-            return Train[Operand]["term"] && Train[MULTIPLY, DIVISION][Term]["term"].Repeat(() => currentIndex);
+            return Train[Operand]["term"] && Train[MULTIPLY, DIVISION][Term]["term"].Repeat();
         }
         private bool Operand()
         {
-            return Train[() => Train[ID, CONSTANT]["operand"], () => Train[LEFT_PARENTHESIS][Expression][RIGHT_PARENTHESIS]["operand"]]["operand"];
+            return Train[LEFT_PARENTHESIS][Expression][RIGHT_PARENTHESIS]["operand"] || Train[ID, CONSTANT]["operand"];
         }
 
         private bool MoveNext(LexemeCodes code)
         {
-            token.ThrowIfCancellationRequested();
-
             if(currentIndex == lexemes.Count)
             {
                 throw new InvalidOperationException($"I need moaar, give me {code}");
@@ -160,20 +125,15 @@ namespace VakunTranslatorVol2.Analyzers
         }
         private Train<LexemeCodes> Train
         {
-            get { return Train<LexemeCodes>.New(currentIndex, i => currentIndex = i); }
+            get { return new Train<LexemeCodes>(); }
         }
 
         private List<Lexeme> lexemes;
         private int currentIndex;
-        private CancellationToken token;
     }
 
     class Train<T>
     {
-        public static Train<T> New(int fallbackIndex, Action<int> fallback)
-        {
-            return new Train<T>(fallbackIndex, fallback);
-        }
         public static Func<T, bool> Predicate { get; set; }
         public static Action<string> OnError { get; set; }
         public static Action OnSuccess { get; set; }
@@ -199,19 +159,7 @@ namespace VakunTranslatorVol2.Analyzers
         {
             get
             {
-                predicates.Add(() =>
-                {
-                    foreach(var predicate in predicateGroup)
-                    {
-                        if(predicate())
-                        {
-                            return true;
-                        }
-                        fallback(fallbackIndex);
-                    }
-                    return false;
-                });
-
+                predicates.Add(() => predicateGroup.Any(x => x()));
                 return this;
             }
         }
@@ -239,32 +187,42 @@ namespace VakunTranslatorVol2.Analyzers
                 OnSuccess();
                 return true;
             }
-            t.fallback(t.fallbackIndex);
             OnError(t.errorMsg);
             return false;
         }
 
-        public bool Repeat(Func<int> fallbackIndexFactory)
+        public bool Repeat()
         {
-            while(predicates.All(x => x()))
+            while(true)
             {
-                fallbackIndex = fallbackIndexFactory();
+                var enumerator = predicates.GetEnumerator();
+
+                enumerator.MoveNext();
+
+                if(enumerator.Current())
+                {
+                    while(enumerator.MoveNext())
+                    {
+                        if(!enumerator.Current())
+                        {
+                            OnError(errorMsg);
+                            return false;
+                        }
+                    }
+                }
+                else
+                {
+                    return true;
+                }
             }
-            fallback(fallbackIndex);
-            OnError(errorMsg);
-            return true;
         }
 
-        private Train(int fallbackIndex, Action<int> onFail)
+        public Train()
         {
-            this.fallbackIndex = fallbackIndex;
-            this.fallback = onFail;
             this.predicates = new List<Func<bool>>();
         }
 
-        private Action<int> fallback;
         private string errorMsg;
-        private int fallbackIndex;
         private List<Func<bool>> predicates;
     }
 }

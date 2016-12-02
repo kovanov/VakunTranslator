@@ -79,7 +79,7 @@
     <Compile Include="Analyzers\PDASyntaxAnalyzer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Analyzers\SyntaxAnalyzer.cs" />
+    <Compile Include="Analyzers\RecursiveSyntaxAnalyzer.cs" />
     <EmbeddedResource Include="AnalyzerWindow.resx">
       <DependentUpon>AnalyzerWindow.cs</DependentUpon>
     </EmbeddedResource>

@@ -8,6 +8,6 @@ namespace VakunTranslatorVol2.Analyzers
         List<Lexeme> Constants { get; }
         List<Lexeme> Identificators { get; }
         List<Lexeme> AllLexemes { get; }
-        List<Lexeme> Analyze(string sourceCode, CancellationToken token);
+        List<Lexeme> Analyze(string sourceCode);
     }
 }

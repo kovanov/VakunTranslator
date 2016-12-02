@@ -22,6 +22,6 @@ namespace VakunTranslatorVol2
         void ClearConsole();
         void HideConsole();
         void ShowConsole();
-        void HighlightSourceCode(IEnumerable<Lexeme> lexemes, CancellationToken token);
+        void HighlightSourceCode(IEnumerable<Lexeme> lexemes);
     }
 }

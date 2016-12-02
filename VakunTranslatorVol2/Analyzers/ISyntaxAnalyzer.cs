@@ -5,6 +5,6 @@ namespace VakunTranslatorVol2.Analyzers
 {
     public interface ISyntaxAnalyzer:IAnalyzer
     {
-        void Analyze(List<Lexeme> lexemes, CancellationToken token);
+        void Analyze(List<Lexeme> lexemes);
     }
 }

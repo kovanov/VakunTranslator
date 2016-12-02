@@ -24,7 +24,7 @@ namespace VakunTranslatorVol2
             ResetColors = true;
         }
 
-        public void Highlight(RichTextBox box, IEnumerable<T> source, CancellationToken token)
+        public void Highlight(RichTextBox box, IEnumerable<T> source)
         {
             var selectionColor = box.SelectionColor;
             var selectionStart = box.SelectionStart;
@@ -42,7 +42,6 @@ namespace VakunTranslatorVol2
 
             foreach(var item in source)
             {
-                token.ThrowIfCancellationRequested();
                 var lastFound = 0;
                 var value = WordSelector(item);
                 var color = painter.GetColor(item);

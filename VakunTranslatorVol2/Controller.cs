@@ -13,7 +13,6 @@ namespace VakunTranslatorVol2
         private ILexicalAnalyzer lexicalAnalyzer;
         private ISyntaxAnalyzer syntaxAnalyzer;
         private FileManager fileManager;
-        private CancellationTokenSource cts;
 
         public Controller(IView view)
         {
@@ -43,42 +42,34 @@ namespace VakunTranslatorVol2
         }
 
 
-        private async void View_AnalyzeRequired(string source)
+        private void View_AnalyzeRequired(string source)
         {
-            cts?.Cancel();
-            cts = new CancellationTokenSource();
-            var token = cts.Token;
-
             view.HideConsole();
 
             using(lexicalAnalyzer)
             using(syntaxAnalyzer)
             {
-                try
+                var lexemes = lexicalAnalyzer.Analyze(source);
+
+                view.HighlightSourceCode(lexemes);
+
+                view.DisplayConstants(lexicalAnalyzer.Constants.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
+                view.DisplayIdentificators(lexicalAnalyzer.Identificators.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
+                view.DisplayLexemes(lexemes.Select(x => new { Body = x.Body, Type = x.Flags, Line = x.Line, Code = x.Code, ConstCode = x.ConstCode }));
+
+                if(lexicalAnalyzer.HasErrors)
                 {
-                    var lexemes = await Task.Run(() => lexicalAnalyzer.Analyze(source, token), token);
+                    ShowErrors(lexicalAnalyzer.Errors);
+                }
+                else
+                {
+                    syntaxAnalyzer.Analyze(lexemes);
 
-                    await Task.Run(() => view.HighlightSourceCode(lexemes, token), token);
-                    
-                    view.DisplayConstants(lexicalAnalyzer.Constants.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
-                    view.DisplayIdentificators(lexicalAnalyzer.Identificators.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
-                    view.DisplayLexemes(lexemes.Select(x => new { Body = x.Body, Type = x.Flags, Line = x.Line, Code = x.Code, ConstCode = x.ConstCode }));
-
-                    if(lexicalAnalyzer.HasErrors)
+                    if(syntaxAnalyzer.HasErrors)
                     {
-                        ShowErrors(lexicalAnalyzer.Errors);
-                    }
-                    else
-                    {
-                        await Task.Run(() => syntaxAnalyzer.Analyze(lexemes, token), token);
-
-                        if(syntaxAnalyzer.HasErrors)
-                        {
-                            ShowErrors(syntaxAnalyzer.Errors);
-                        }
+                        ShowErrors(syntaxAnalyzer.Errors);
                     }
                 }
-                catch(OperationCanceledException) { }
             }
         }
 

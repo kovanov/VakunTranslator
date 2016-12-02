@@ -17,19 +17,14 @@ namespace VakunTranslatorVol2.Analyzers
 
         private int lineNumber;
 
-        public List<Lexeme> Analyze(string sourceCode, CancellationToken token)
+        public List<Lexeme> Analyze(string sourceCode)
         {
             Mode.LexemeComplited += SaveLexeme;
             Mode.NewLine += MoveToNextLine;
 
             try
             {
-                sourceCode.Aggregate(Mode.Initial, (acc, symbol) =>
-                {
-                    token.ThrowIfCancellationRequested();
-                    return acc.MoveNext(symbol);
-                }).PickLast();
-
+                sourceCode.Aggregate(Mode.Initial, (acc, symbol) => acc.MoveNext(symbol)).PickLast();
                 DefineIds();
             }
             catch(ArgumentException e)
@@ -75,7 +70,7 @@ namespace VakunTranslatorVol2.Analyzers
                         {
                             if(string.IsNullOrEmpty(current.Type))
                             {
-                                foreach(var lexeme in AllLexemes.Where(x=>type.Line <= x.Line).Where(x => x.Body == current.Body))
+                                foreach(var lexeme in AllLexemes.Where(x => type.Line <= x.Line).Where(x => x.Body == current.Body))
                                 {
                                     lexeme.Type = type.Body;
                                 }
@@ -85,7 +80,7 @@ namespace VakunTranslatorVol2.Analyzers
                                 throw new InvalidOperationException($"Error at line {current.Line}, {current.Body} already defined");
                             }
                         }
-                        if(!current.Is(LexemeFlags.Id| LexemeFlags.InlineDelimiter))
+                        if(!current.Is(LexemeFlags.Id | LexemeFlags.InlineDelimiter))
                         {
                             break;
                         }

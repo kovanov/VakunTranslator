@@ -39,9 +39,9 @@ namespace VakunTranslatorVol2
         {
             analyzerWindow.DisplayLexemes(source);
         }
-        public void HighlightSourceCode(IEnumerable<Lexeme> source, CancellationToken token)
+        public void HighlightSourceCode(IEnumerable<Lexeme> source)
         {
-            Invoke((Action)(() => colorizer?.Highlight(sourceBox, source, token)));
+            colorizer?.Highlight(sourceBox, source);
         }
         public void WriteConsole(IEnumerable<string> lines)
         {
