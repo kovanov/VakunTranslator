@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using VakunTranslatorVol2.Analyzers;
 
 namespace VakunTranslatorVol2
 {
@@ -71,6 +72,10 @@ namespace VakunTranslatorVol2
         {
             this.colorizer = colorizer;
         }
+        public void SetPDAOutput(List<PDASyntaxAnalyzer.UsedRule> rules)
+        {
+            pdaWindow.SetRules(rules);
+        }
 
         private void sourceBox_TextChanged(object sender, EventArgs e)
         {
@@ -109,10 +114,21 @@ namespace VakunTranslatorVol2
             sourceBox.Find(body, start, end, RichTextBoxFinds.WholeWord);
             Focus();
         }
+        private void pDAAnalyzerOutputToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pdaWindow.ShowDialog();
+        }
+
+        private void checkGrammarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
 
         private const int CONSOLE_HEIGHT = 250;
         private string lastSource = string.Empty;
         private Colorizer<Lexeme> colorizer;
         private AnalyzerWindow analyzerWindow = new AnalyzerWindow();
+        private PDAOutputForm pdaWindow = new PDAOutputForm();
+        private GrammarCheckForm grammarCheck = new GrammarCheckForm();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using VakunTranslatorVol2.Analyzers;
 
 namespace VakunTranslatorVol2
 {
@@ -21,6 +22,7 @@ namespace VakunTranslatorVol2
         void SetSourceCode(string text);
         void ClearConsole();
         void HideConsole();
+        void SetPDAOutput(List<PDASyntaxAnalyzer.UsedRule> obj);
         void ShowConsole();
         void HighlightSourceCode(IEnumerable<Lexeme> lexemes);
     }

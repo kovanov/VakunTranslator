@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using VakunTranslatorVol2.Extensions;
 using static VakunTranslatorVol2.LexemeCodes;
 
 namespace VakunTranslatorVol2.Analyzers
@@ -19,9 +17,9 @@ namespace VakunTranslatorVol2.Analyzers
         private List<UsedRule> usedRules = new List<UsedRule>();
         private Action<List<UsedRule>> onReady;
 
-        public PDASyntaxAnalyzer(Action<List<UsedRule>> onReady = null)
+        public PDASyntaxAnalyzer(Action<List<UsedRule>> onReady)
         {
-            this.onReady = onReady ?? (x => { });
+            this.onReady = onReady;
         }
         public void Analyze(List<Lexeme> lexemes)
         {
@@ -70,45 +68,41 @@ namespace VakunTranslatorVol2.Analyzers
             {
                 return bubbleStack.Pop();
             }
-            else
+
+            if(rule.Stack != null)
             {
-                if(rule.Stack != null)
-                {
-                    bubbleStack.Push((int)rule.Stack);
-                }
-                return (int)rule.Beta;
+                bubbleStack.Push((int)rule.Stack);
             }
+
+            return (int)rule.Beta;
         }
         private int ParseFault(IEnumerable<PDARule> currentRules)
         {
             var rule = currentRules.First();
             var faultString = rule.OnComparisionFault;
 
-            switch(faultString)
+            if(faultString == "exit")
             {
-                case "exit":
-                    {
-                        return bubbleStack.Pop();
-                    }
-                case "error":
-                    {
-                        var expectedCodes = currentRules.Select(x => x.LexemeCode);
-                        var errorMessage = string.Join(", ", expectedCodes);
-
-                        throw new ArgumentException($"Error, expected {errorMessage}");
-                    }
-                default:
-                    {
-                        var numbers = faultString.Split().Select(int.Parse).ToArray();
-
-                        var newAlpha = numbers.First();
-                        var stack = numbers.Last();
-
-                        bubbleStack.Push(stack);
-
-                        return newAlpha;
-                    }
+                return bubbleStack.Pop();
             }
+
+            if(faultString == "error")
+            {
+                var expectedCodes = currentRules.Select(x => x.LexemeCode);
+                var errorMessage = string.Join(", ", expectedCodes);
+
+                throw new ArgumentException($"Error, expected {errorMessage}");
+            }
+
+
+            var numbers = faultString.Split().Select(int.Parse).ToArray();
+
+            var newAlpha = numbers.First();
+            var stack = numbers.Last();
+
+            bubbleStack.Push(stack);
+
+            return newAlpha;
         }
 
         public void Dispose()
@@ -135,7 +129,8 @@ namespace VakunTranslatorVol2.Analyzers
             new PDARule { Alpha = 6,    LexemeCode = IF,                 Beta = 37, Stack = 31,                                                             },
             new PDARule { Alpha = 6,    LexemeCode = GOTO,               Beta = 33,                                                                         },
             new PDARule { Alpha = 7,    LexemeCode = ID,                 Beta = 8,                                                                          },
-            new PDARule { Alpha = 8,    LexemeCode = COMMA,              Beta = 7,              OnComparisionFault = "exit"                                 },
+            new PDARule { Alpha = 8,    LexemeCode = COMMA,              Beta = 41,             OnComparisionFault = "exit"                                 },
+            new PDARule { Alpha = 8,    LexemeCode = ASSIGN,             Beta = 34,             OnComparisionFault = "exit"                                 },
             new PDARule { Alpha = 9,    LexemeCode = NOTHING,                                   OnComparisionFault = "exit"                                 },
             new PDARule { Alpha = 10,   LexemeCode = ID,                                                                    OnComparisionSuccess = "exit"   },
             new PDARule { Alpha = 12,   LexemeCode = LEFT_PARENTHESIS,   Beta = 13,                                                                         },
@@ -178,6 +173,8 @@ namespace VakunTranslatorVol2.Analyzers
             new PDARule { Alpha = 39,   LexemeCode = RIGHT_PARENTHESIS,  Beta = 40,                                                                         },
             new PDARule { Alpha = 40,   LexemeCode = AND,                Beta = 37,             OnComparisionFault = "exit"                                 },
             new PDARule { Alpha = 40,   LexemeCode = OR,                 Beta = 37,             OnComparisionFault = "exit"                                 },
+            new PDARule { Alpha = 41,   LexemeCode = ID,                 Beta = 42,                                                                         },
+            new PDARule { Alpha = 42,   LexemeCode = COMMA,              Beta = 41,             OnComparisionFault = "exit"                                 },
         };
 
         public class PDARule

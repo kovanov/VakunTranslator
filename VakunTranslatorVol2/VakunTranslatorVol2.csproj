@@ -55,6 +55,12 @@
       <DependentUpon>AnalyzerWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="CodeHighlight\Colorizer.cs" />
+    <Compile Include="GrammarCheckForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GrammarCheckForm.Designer.cs">
+      <DependentUpon>GrammarCheckForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="LexemeCodes.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="CustomFace\CustomColorTable.cs" />
@@ -77,6 +83,12 @@
     <Compile Include="Modes\Mode.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Analyzers\PDASyntaxAnalyzer.cs" />
+    <Compile Include="PDAOutputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PDAOutputForm.Designer.cs">
+      <DependentUpon>PDAOutputForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Analyzers\RecursiveSyntaxAnalyzer.cs" />
@@ -85,6 +97,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GrammarCheckForm.resx">
+      <DependentUpon>GrammarCheckForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PDAOutputForm.resx">
+      <DependentUpon>PDAOutputForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

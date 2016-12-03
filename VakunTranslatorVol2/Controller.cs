@@ -22,7 +22,7 @@ namespace VakunTranslatorVol2
 
             lexicalAnalyzer = new LexicalAnalyzer();
             //syntaxAnalyzer = new RecursiveSyntaxAnalyzer();
-            syntaxAnalyzer = new PDASyntaxAnalyzer();
+            syntaxAnalyzer = new PDASyntaxAnalyzer(view.SetPDAOutput);
 
             view.SetColorizer(new Colorizer<Lexeme>(new LexemePainter())
             {
