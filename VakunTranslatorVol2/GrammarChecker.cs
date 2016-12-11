@@ -41,7 +41,6 @@ namespace VakunTranslatorVol2
                 }
             }
         }
-
         private void FillSharp(string[,] precedenceTable)
         {
             var length = precedenceTable.GetLength(0) - 1;
@@ -51,49 +50,46 @@ namespace VakunTranslatorVol2
                 precedenceTable[i, length] = ">";
             }
         }
-
         private void FillMore(string[,] precedenceTable, List<string> lexemesMap, Dictionary<string, string[]> firstMap, Dictionary<string, string[]> lastMap)
         {
             for(int i = 1; i < precedenceTable.GetLength(0); i++)
             {
                 for(int j = 1; j < precedenceTable.GetLength(1); j++)
                 {
-                    if("=".Equals(precedenceTable[i, j]))
+                    if("=".Equals(precedenceTable[i, j]) && lastMap.ContainsKey(precedenceTable[i, 0]))
                     {
-                        if(lastMap.ContainsKey(precedenceTable[i, 0]))
+                        if(IsNonTerminal(precedenceTable[0, j]))
                         {
-                            if(IsNonTerminal(precedenceTable[0, j]))
+                            foreach(var lexeme in lastMap[precedenceTable[i, 0]])
                             {
-                                foreach(var lexeme in lastMap[precedenceTable[i, 0]])
-                                {
-                                    foreach(var lexemeS in firstMap[precedenceTable[0, j]])
-                                    {
-                                        var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
-                                        var lexemeSPosition = lexemesMap.IndexOf(lexemeS) + 1;
-                                        if(string.IsNullOrEmpty(precedenceTable[lexemePosition, lexemeSPosition]) || ">".Equals(precedenceTable[lexemePosition, lexemeSPosition]))
-                                        {
-                                            precedenceTable[lexemePosition, lexemeSPosition] = ">";
-                                        }
-                                        else
-                                        {
-                                            throw new ArgumentException($"Конфлікт >. Відношення ({precedenceTable[lexemePosition, 0]} i {precedenceTable[0, lexemeSPosition]}) уже існує {precedenceTable[lexemePosition, j]}");
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                foreach(var lexeme in lastMap[precedenceTable[i, 0]])
+                                foreach(var lexemeS in firstMap[precedenceTable[0, j]])
                                 {
                                     var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
-                                    if(string.IsNullOrEmpty(precedenceTable[lexemePosition, j]) || ">".Equals(precedenceTable[lexemePosition, j]))
+                                    var lexemeSPosition = lexemesMap.IndexOf(lexemeS) + 1;
+
+                                    if(string.IsNullOrEmpty(precedenceTable[lexemePosition, lexemeSPosition]) || ">".Equals(precedenceTable[lexemePosition, lexemeSPosition]))
                                     {
-                                        precedenceTable[lexemePosition, j] = ">";
+                                        precedenceTable[lexemePosition, lexemeSPosition] = ">";
                                     }
                                     else
                                     {
-                                        throw new ArgumentException($"Конфлікт >. Відношення ({precedenceTable[lexemePosition, 0]} i {precedenceTable[0, j]}) уже існує {precedenceTable[lexemePosition, j]}");
+                                        throw new ArgumentException($"Конфлікт >. Відношення ({precedenceTable[lexemePosition, 0]} i {precedenceTable[0, lexemeSPosition]}) уже існує {precedenceTable[lexemePosition, j]}");
                                     }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach(var lexeme in lastMap[precedenceTable[i, 0]])
+                            {
+                                var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
+                                if(string.IsNullOrEmpty(precedenceTable[lexemePosition, j]) || ">".Equals(precedenceTable[lexemePosition, j]))
+                                {
+                                    precedenceTable[lexemePosition, j] = ">";
+                                }
+                                else
+                                {
+                                    throw new ArgumentException($"Конфлікт >. Відношення ({precedenceTable[lexemePosition, 0]} i {precedenceTable[0, j]}) уже існує {precedenceTable[lexemePosition, j]}");
                                 }
                             }
                         }
@@ -101,7 +97,6 @@ namespace VakunTranslatorVol2
                 }
             }
         }
-
         private void FillLess(string[,] precedenceTable, List<string> lexemesMap, Dictionary<string, string[]> firstMap)
         {
             for(int i = 1; i < precedenceTable.GetLength(0); i++)
@@ -115,6 +110,7 @@ namespace VakunTranslatorVol2
                             foreach(var lexeme in firstMap[precedenceTable[0, j]])
                             {
                                 var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
+
                                 if(string.IsNullOrEmpty(precedenceTable[i, lexemePosition]) || "<".Equals(precedenceTable[i, lexemePosition]))
                                 {
                                     precedenceTable[i, lexemePosition] = "<";
@@ -129,7 +125,6 @@ namespace VakunTranslatorVol2
                 }
             }
         }
-
         private void FillEquals(string[,] precedenceTable, List<string> lexemesMap)
         {
             foreach(var line in map.Values)
@@ -144,68 +139,53 @@ namespace VakunTranslatorVol2
             }
         }
 
-        private Dictionary<string, string[]> GetLastMap(List<string> lexemesMap)
+        private string[] GetPlus(string parent, Func<string[], string> selector)
         {
-            return lexemesMap.Where(IsNonTerminal)
-                .ToDictionary(x => x, GetLastPlus);
-        }
+            Stack<string> queue = new Stack<string>();
+            List<string> result = new List<string>();
 
+            queue.Push(parent);
+
+            while(queue.Any())
+            {
+                string lexeme = queue.Pop();
+
+                foreach(var line in map[lexeme])
+                {
+                    var item = selector(line);
+                    if(!result.Contains(item))
+                    {
+                        result.Add(item);
+                        if(IsNonTerminal(item))
+                        {
+                            queue.Push(item);
+                        }
+                    }
+                }
+            }
+
+            return result.ToArray();
+        }
         private string[] GetLastPlus(string parent)
         {
-            Stack<string> queue = new Stack<string>();
-            List<string> lasts = new List<string>();
-            string lexeme;
-            queue.Push(parent);
-            while(queue.Any())
-            {
-                lexeme = queue.Pop();
-
-                foreach(var line in map[lexeme])
-                {
-                    var lastInLine = line.Last();
-                    if(!lasts.Contains(lastInLine))
-                    {
-                        lasts.Add(lastInLine);
-                        if(IsNonTerminal(lastInLine))
-                        {
-                            queue.Push(lastInLine);
-                        }
-                    }
-                }
-            }
-            return lasts.ToArray();
+            return GetPlus(parent, x => x.Last());
         }
-
-        private Dictionary<string, string[]> GetFirstMap(List<string> lexemesMap)
-        {
-            return lexemesMap.Where(IsNonTerminal)
-                .ToDictionary(x => x, GetFirstPlus);
-        }
-
         private string[] GetFirstPlus(string parent)
         {
-            Stack<string> queue = new Stack<string>();
-            List<string> firsts = new List<string>();
-            queue.Push(parent);
-            string lexeme;
-            while(queue.Any())
-            {
-                lexeme = queue.Pop();
+            return GetPlus(parent, x => x.First());
+        }
 
-                foreach(var line in map[lexeme])
-                {
-                    var firstInLine = line.First();
-                    if(!firsts.Contains(firstInLine))
-                    {
-                        firsts.Add(firstInLine);
-                        if(IsNonTerminal(firstInLine))
-                        {
-                            queue.Push(firstInLine);
-                        }
-                    }
-                }
-            }
-            return firsts.ToArray();
+        private Dictionary<string, string[]> GetMap(List<string> lexemesMap, Func<string, string[]> selector)
+        {
+            return lexemesMap.Where(IsNonTerminal).ToDictionary(x => x, selector);
+        }
+        private Dictionary<string, string[]> GetFirstMap(List<string> lexemesMap)
+        {
+            return GetMap(lexemesMap, GetFirstPlus);
+        }
+        private Dictionary<string, string[]> GetLastMap(List<string> lexemesMap)
+        {
+            return GetMap(lexemesMap, GetLastPlus);
         }
 
         private string[,] BuildPrecedenceTable(List<string> lexemesMap)
@@ -221,13 +201,29 @@ namespace VakunTranslatorVol2
 
             return table;
         }
-
         private List<string> BuildLexemesMap(string[] terminals)
         {
             return map.Keys
                 .Union(terminals)
                 .Union(new[] { "#" })
                 .ToList();
+        }
+        private Dictionary<string, string[][]> BuildMap(string grammar)
+        {
+            return grammar
+                    .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Split(new[] { "::=" }, StringSplitOptions.RemoveEmptyEntries))
+                    .Select(x => new
+                    {
+                        Head = x.First(),
+                        Tail = x.Last().Split('|')
+                    })
+                    .Select(x => new
+                    {
+                        Head = x.Head,
+                        Tail = x.Tail.Select(y => y.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)).ToArray()
+                    })
+                    .ToDictionary(x => x.Head, x => x.Tail);
         }
 
         private string[] GetTerminals()
@@ -243,37 +239,17 @@ namespace VakunTranslatorVol2
 
         private void CheckForUndefinedTerminals()
         {
-            foreach(var pair in map)
+            var unknownWord = map
+                        .SelectMany(x => x.Value)
+                        .SelectMany(x => x)
+                        .FirstOrDefault(x => !map.ContainsKey(x) && IsNonTerminal(x));
+
+            if(!string.IsNullOrEmpty(unknownWord))
             {
-                foreach(var line in pair.Value)
-                {
-                    foreach(var lexeme in line)
-                    {
-                        if(!map.ContainsKey(lexeme) && IsNonTerminal(lexeme))
-                        {
-                            throw new ArgumentException($"Can't find {lexeme} definition");
-                        }
-                    }
-                }
+                throw new ArgumentException($"Can't find {unknownWord} definition");
             }
         }
 
-        private Dictionary<string, string[][]> BuildMap(string grammar)
-        {
-            return grammar.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => x.Split(new[] { "::=" }, StringSplitOptions.RemoveEmptyEntries))
-                    .Select(x => new
-                    {
-                        Head = x.First(),
-                        Tail = x.Last().Split('|')
-                    })
-                    .ToDictionary(
-                        keySelector: x => x.Head,
-                        elementSelector: x => x.Tail
-                                                .Select(y => y.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries))
-                                                .ToArray()
-                    );
-        }
 
         private bool IsNonTerminal(string str)
         {
