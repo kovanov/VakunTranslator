@@ -7,11 +7,12 @@ namespace VakunTranslatorVol2
 {
     public interface IView
     {
-        event Action<string> AnalyzeRequired;
-        event Action NewFileClick;
-        event Action OpenFileClick;
-        event Action<string> SaveFileClick;
+        event Action<string> SourceCodeAnalyzeRequired;
         event Action<string> SaveFileAsClick;
+        event Action<string> SaveFileClick;
+        event Action OpenSourceCodeFileClick;
+        event Action GrammarAnalyzeRequired;
+        event Action NewFileClick;
 
         void WriteConsole(string message);
         void DisplayConstants<T>(IEnumerable<T> source);
@@ -25,5 +26,7 @@ namespace VakunTranslatorVol2
         void SetPDAOutput(List<PDASyntaxAnalyzer.UsedRule> obj);
         void ShowConsole();
         void HighlightSourceCode(IEnumerable<Lexeme> lexemes);
+        void ShowGrammarError(string message);
+        void ShowGrammarTable(string[,] table);
     }
 }

@@ -17,8 +17,9 @@ namespace VakunTranslatorVol2
         public Controller(IView view)
         {
             this.view = view;
-            view.AnalyzeRequired += View_AnalyzeRequired;
-            view.OpenFileClick += View_OpenFileClick;
+            view.SourceCodeAnalyzeRequired += View_SourceCodeAnalyzeRequired;
+            view.GrammarAnalyzeRequired += View_GrammarAnalyzeRequired;
+            view.OpenSourceCodeFileClick += View_OpenSourceCodeFileClick;
 
             lexicalAnalyzer = new LexicalAnalyzer();
             //syntaxAnalyzer = new RecursiveSyntaxAnalyzer();
@@ -33,7 +34,26 @@ namespace VakunTranslatorVol2
             fileManager = new FileManager();
         }
 
-        private void View_OpenFileClick()
+        private void View_GrammarAnalyzeRequired()
+        {
+            var fileManager = new FileManager();
+
+            if(fileManager.OpenFileDialog())
+            {
+                try
+                {
+                    var grammarChecker = new GrammarChecker();
+                    var table = grammarChecker.Check(fileManager.Text);
+                    view.ShowGrammarTable(table);
+                }
+                catch(Exception e)
+                {
+                    view.ShowGrammarError(e.Message);
+                }
+            }
+        }
+
+        private void View_OpenSourceCodeFileClick()
         {
             if(fileManager.OpenFileDialog())
             {
@@ -42,7 +62,7 @@ namespace VakunTranslatorVol2
         }
 
 
-        private void View_AnalyzeRequired(string source)
+        private void View_SourceCodeAnalyzeRequired(string source)
         {
             view.HideConsole();
 

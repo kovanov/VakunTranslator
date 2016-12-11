@@ -10,9 +10,10 @@ namespace VakunTranslatorVol2
 {
     public partial class Form1 : Form, IView
     {
-        public event Action<string> AnalyzeRequired;
+        public event Action<string> SourceCodeAnalyzeRequired;
+        public event Action GrammarAnalyzeRequired;
         public event Action NewFileClick;
-        public event Action OpenFileClick;
+        public event Action OpenSourceCodeFileClick;
         public event Action<string> SaveFileClick;
         public event Action<string> SaveFileAsClick;
 
@@ -22,6 +23,11 @@ namespace VakunTranslatorVol2
             menuStrip1.Renderer = new CustomToolStripRenderer();
             sourceBox.SelectionTabs = Enumerable.Range(1, 10).Select(x => x * 14).ToArray();
             analyzerWindow.LexemSelected += AnalyzerWindow_LexemSelected;
+        }
+
+        private void GrammarCheck_AnalyzeRequired(string grammar)
+        {
+            GrammarAnalyzeRequired?.Invoke();
         }
 
         public void ClearConsole()
@@ -83,7 +89,7 @@ namespace VakunTranslatorVol2
             if(!lastSource.Equals(source))
             {
                 lastSource = source;
-                AnalyzeRequired?.Invoke(source);
+                SourceCodeAnalyzeRequired?.Invoke(source);
             }
         }
         private void lexicalAnlyzerOutputToolStripMenuItem_Click(object sender, EventArgs e)
@@ -96,7 +102,7 @@ namespace VakunTranslatorVol2
         }
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileClick?.Invoke();
+            OpenSourceCodeFileClick?.Invoke();
         }
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -119,9 +125,20 @@ namespace VakunTranslatorVol2
             pdaWindow.ShowDialog();
         }
 
-        private void checkGrammarToolStripMenuItem_Click(object sender, EventArgs e)
+        public void ShowGrammarError(string message)
         {
+            MessageBox.Show(message);
+        }
 
+        public void ShowGrammarTable(string[,] table)
+        {
+            var grammarForm = new GrammarCheckForm(table);
+            grammarForm.ShowDialog();
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            GrammarAnalyzeRequired?.Invoke();
         }
 
         private const int CONSOLE_HEIGHT = 250;
@@ -129,6 +146,5 @@ namespace VakunTranslatorVol2
         private Colorizer<Lexeme> colorizer;
         private AnalyzerWindow analyzerWindow = new AnalyzerWindow();
         private PDAOutputForm pdaWindow = new PDAOutputForm();
-        private GrammarCheckForm grammarCheck = new GrammarCheckForm();
     }
 }

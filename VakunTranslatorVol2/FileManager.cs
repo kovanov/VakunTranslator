@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace VakunTranslatorVol2
@@ -15,7 +16,7 @@ namespace VakunTranslatorVol2
             if(dialog.ShowDialog() == DialogResult.OK)
             {
                 fileName = dialog.FileName;
-                Text = File.ReadAllText(fileName);
+                Text = File.ReadAllText(fileName, Encoding.Unicode);
                 return true;
             }
             else

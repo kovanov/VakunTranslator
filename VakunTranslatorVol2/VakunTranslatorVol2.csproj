@@ -55,6 +55,7 @@
       <DependentUpon>AnalyzerWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="CodeHighlight\Colorizer.cs" />
+    <Compile Include="GrammarChecker.cs" />
     <Compile Include="GrammarCheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
