@@ -1,22 +1,33 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using VakunTranslatorVol2.Model;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.CodeHighlight
 {
     public class LexemePainter : IPainter<Lexeme>
     {
         public Color DefaultColor { get; } = Color.FromArgb(170, 170, 170);
 
+        private readonly Color _blue = Color.FromArgb(50, 120, 230);
+        private readonly Color _orange = Color.FromArgb(230, 120, 20);
+        private readonly Color _red = Color.FromArgb(230, 100, 100);
+
         public Color GetColor(Lexeme lexeme)
         {
-            return colorTable[lexeme.Flags];
-        }
+            if (lexeme.Is(LexemeFlags.Reserved))
+            {
+                return _blue;
+            }
+            if (lexeme.Is(LexemeFlags.Const))
+            {
+                return _red;
+            }
+            if (lexeme.Is(LexemeFlags.TypeDefinition))
+            {
+                return _orange;
+            }
 
-        private static Dictionary<LexemeFlags, Color> colorTable = new Dictionary<LexemeFlags, Color>
-        {
-            [LexemeFlags.Reserved] = Color.FromArgb(50, 120, 230),
-            [LexemeFlags.TypeDefinition] = Color.FromArgb(230, 120, 20),
-            [LexemeFlags.Const] = Color.FromArgb(230, 100, 100)
-        };
+            return DefaultColor;
+        }
     }
 }

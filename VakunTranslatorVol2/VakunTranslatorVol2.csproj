@@ -45,64 +45,90 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Analyzers\IAnalyzer.cs" />
-    <Compile Include="Analyzers\ILexicalAnalyzer.cs" />
-    <Compile Include="Analyzers\ISyntaxAnalyzer.cs" />
-    <Compile Include="AnalyzerWindow.cs">
+    <Compile Include="Extensions\StackExtensions.cs" />
+    <Compile Include="Model\Analyzers\AscendingAnalyzer.cs" />
+    <Compile Include="Model\Analyzers\IAnalyzer.cs" />
+    <Compile Include="Model\Analyzers\ILexicalAnalyzer.cs" />
+    <Compile Include="Model\Analyzers\ISyntaxAnalyzer.cs" />
+    <Compile Include="Model\Analyzers\SyntaxAnalyzer.cs" />
+    <Compile Include="Model\PolizGenerator.cs" />
+    <Compile Include="Views\ExecutingForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AnalyzerWindow.Designer.cs">
-      <DependentUpon>AnalyzerWindow.cs</DependentUpon>
+    <Compile Include="Views\ExecutingForm.Designer.cs">
+      <DependentUpon>ExecutingForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\LexicalAnalyzerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\LexicalAnalyzerForm.Designer.cs">
+      <DependentUpon>LexicalAnalyzerForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AscendingAnalyzerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\AscendingAnalyzerForm.Designer.cs">
+      <DependentUpon>AscendingAnalyzerForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CodeHighlight\Colorizer.cs" />
-    <Compile Include="GrammarChecker.cs" />
-    <Compile Include="GrammarCheckForm.cs">
+    <Compile Include="Model\GrammarChecker.cs" />
+    <Compile Include="Views\GrammarCheckForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GrammarCheckForm.Designer.cs">
+    <Compile Include="Views\GrammarCheckForm.Designer.cs">
       <DependentUpon>GrammarCheckForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="LexemeCodes.cs" />
+    <Compile Include="Model\LexemeCodes.cs" />
     <Compile Include="Controller.cs" />
     <Compile Include="CustomFace\CustomColorTable.cs" />
     <Compile Include="CustomFace\CustomToolStripRenderer.cs" />
     <Compile Include="Extensions\CharExtensions.cs" />
-    <Compile Include="Extensions\IEnumerableExtensions.cs" />
-    <Compile Include="FileManager.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Model\FileManager.cs" />
+    <Compile Include="Views\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Views\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="CodeHighlight\IPainter.cs" />
-    <Compile Include="IView.cs" />
-    <Compile Include="Lexeme.cs" />
+    <Compile Include="Views\IMainForm.cs" />
+    <Compile Include="Model\Lexeme.cs" />
     <Compile Include="CodeHighlight\LexemePainter.cs" />
-    <Compile Include="Analyzers\LexicalAnalyzer.cs" />
-    <Compile Include="Modes\InitalMode.cs" />
-    <Compile Include="Modes\Mode.cs" />
-    <Compile Include="Extensions\ObjectExtensions.cs" />
-    <Compile Include="Analyzers\PDASyntaxAnalyzer.cs" />
-    <Compile Include="PDAOutputForm.cs">
+    <Compile Include="Model\Analyzers\LexicalAnalyzer.cs" />
+    <Compile Include="Model\Modes\InitalMode.cs" />
+    <Compile Include="Model\Modes\Mode.cs" />
+    <Compile Include="Model\Analyzers\PDASyntaxAnalyzer.cs" />
+    <Compile Include="Views\PDAOutputForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PDAOutputForm.Designer.cs">
+    <Compile Include="Views\PDAOutputForm.Designer.cs">
       <DependentUpon>PDAOutputForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Analyzers\RecursiveSyntaxAnalyzer.cs" />
-    <EmbeddedResource Include="AnalyzerWindow.resx">
-      <DependentUpon>AnalyzerWindow.cs</DependentUpon>
+    <Compile Include="Model\Analyzers\RecursiveSyntaxAnalyzer.cs" />
+    <Compile Include="Views\PolizForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Views\PolizForm.Designer.cs">
+      <DependentUpon>PolizForm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Views\ExecutingForm.resx">
+      <DependentUpon>ExecutingForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Views\LexicalAnalyzerForm.resx">
+      <DependentUpon>LexicalAnalyzerForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GrammarCheckForm.resx">
+    <EmbeddedResource Include="Views\AscendingAnalyzerForm.resx">
+      <DependentUpon>AscendingAnalyzerForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\GrammarCheckForm.resx">
       <DependentUpon>GrammarCheckForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PDAOutputForm.resx">
+    <EmbeddedResource Include="Views\PDAOutputForm.resx">
       <DependentUpon>PDAOutputForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -114,6 +140,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Views\PolizForm.resx">
+      <DependentUpon>PolizForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

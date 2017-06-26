@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using VakunTranslatorVol2.Extensions;
-using VakunTranslatorVol2.Modes;
+using VakunTranslatorVol2.Model.Modes;
 
-namespace VakunTranslatorVol2.Analyzers
+namespace VakunTranslatorVol2.Model.Analyzers
 {
     public class LexicalAnalyzer : ILexicalAnalyzer
     {
@@ -66,7 +66,7 @@ namespace VakunTranslatorVol2.Analyzers
                     while(moveNext = enumerator.MoveNext())
                     {
                         var current = enumerator.Current;
-                        if(current.Is(LexemeFlags.Id))
+                        if(current.Is(LexemeCodes.ID) || current.Is(LexemeCodes.LABEL_ID))
                         {
                             if(string.IsNullOrEmpty(current.Type))
                             {
@@ -118,14 +118,26 @@ namespace VakunTranslatorVol2.Analyzers
             var lexeme = Lexeme.Parse(accumulatedLexeme);
             lexeme.Line = lineNumber;
 
-            if(lexeme.Is(LexemeFlags.Const))
+            if(lexeme.Is(LexemeCodes.CONSTANT))
             {
                 AddTo(Constants, lexeme);
             }
 
-            if(lexeme.Is(LexemeFlags.Id))
+            if(lexeme.Is(LexemeCodes.ID))
             {
-                AddTo(Identificators, lexeme);
+                var exsistingId = AllLexemes.FirstOrDefault(x => x.Body == lexeme.Body);
+                if (exsistingId != null)
+                {
+                    lexeme.Code = exsistingId.Code;
+                }
+                else if (AllLexemes.Count > 0 && AllLexemes.Last().Is(LexemeCodes.LABEL))
+                {
+                    lexeme.Code = (int)LexemeCodes.LABEL_ID;
+                }
+                else
+                {
+                    AddTo(Identificators, lexeme);
+                }
             }
 
             AllLexemes.Add(lexeme);

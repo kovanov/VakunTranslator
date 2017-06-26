@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using VakunTranslatorVol2.Views;
 
 namespace VakunTranslatorVol2
 {
@@ -16,7 +14,7 @@ namespace VakunTranslatorVol2
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var view = new Form1();
+            var view = new MainForm();
             var controller = new Controller(view);
             Application.Run(view);
         }

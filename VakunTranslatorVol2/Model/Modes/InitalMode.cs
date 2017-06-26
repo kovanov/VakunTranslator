@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using VakunTranslatorVol2.Extensions;
 
-namespace VakunTranslatorVol2.Modes
+namespace VakunTranslatorVol2.Model.Modes
 {
     public class InitalMode : Mode
     {

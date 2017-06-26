@@ -1,6 +1,6 @@
-﻿namespace VakunTranslatorVol2
+﻿namespace VakunTranslatorVol2.Views
 {
-    partial class AnalyzerWindow
+    partial class LexicalAnalyzerForm
     {
         /// <summary>
         /// Required designer variable.

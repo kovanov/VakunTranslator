@@ -49,6 +49,6 @@ namespace VakunTranslatorVol2.Extensions
             return c.Equals('=');
         }
         private static char[] operators = new[] { '<', '>', '!', '=' };
-        private static char[] delimiters = new[] { '{', '}', '(', ')', ';', ',', '*', '/', ':', '&', '|' };
+        private static char[] delimiters = new[] { '{', '}', '(', ')','[',']', ';', ',', '*', '/', ':', '&', '|' };
     }
 }

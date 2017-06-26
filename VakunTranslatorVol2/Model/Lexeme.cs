@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.Model
 {
     [Flags]
     public enum LexemeFlags
@@ -27,6 +27,12 @@ namespace VakunTranslatorVol2
         public int Line { get; set; }
         public int ConstCode { get; set; }
 
+        public Lexeme(string body, int code)
+        {
+            Body = body;
+            Code = code;
+        }
+
         private Lexeme(string body, LexemeFlags flags, int code)
         {
             Body = body;
@@ -47,16 +53,16 @@ namespace VakunTranslatorVol2
 
         private static int GetCode(string value)
         {
-            if(lexemTable.ContainsKey(value))
+            if (lexemTable.ContainsKey(value))
             {
                 return lexemTable.Keys.ToList().IndexOf(value);
             }
 
-            return lexemTable.Count + 1;
+            return (int)LexemeCodes.ID;
         }
         private static LexemeFlags GetFlags(string value)
         {
-            if(lexemTable.ContainsKey(value))
+            if (lexemTable.ContainsKey(value))
             {
                 return lexemTable[value];
             }
@@ -65,10 +71,15 @@ namespace VakunTranslatorVol2
         }
         private static Lexeme CreateConstLexeme(string value)
         {
-            double fConst;
-            if(double.TryParse(value.Replace(".", ","), out fConst))
+            var lexemCode = (int)LexemeCodes.CONSTANT;
+
+            if (int.TryParse(value, out int iConst))
             {
-                var lexemCode = lexemTable.Count;
+                return new Lexeme(value, LexemeFlags.Const, lexemCode) { Type = "int" };
+            }
+
+            if (double.TryParse(value.Replace(".", ","), out double dConst))
+            {
                 return new Lexeme(value, LexemeFlags.Const, lexemCode) { Type = "float" };
             }
 
@@ -80,6 +91,11 @@ namespace VakunTranslatorVol2
             return (Flags & flag) != 0;
         }
 
+        public bool Is(LexemeCodes code)
+        {
+            return (LexemeCodes)Code == code;
+        }
+
         public override bool Equals(object obj)
         {
             return (obj as Lexeme)?.Body.Equals(Body) ?? false;
@@ -88,6 +104,11 @@ namespace VakunTranslatorVol2
         public override int GetHashCode()
         {
             return Code;
+        }
+
+        public override string ToString()
+        {
+            return $"{(LexemeCodes)Code} '{Body}'";
         }
 
         private static Dictionary<string, LexemeFlags> lexemTable = new Dictionary<string, LexemeFlags>
@@ -102,13 +123,11 @@ namespace VakunTranslatorVol2
             [","] = LexemeFlags.InlineDelimiter,
             ["("] = LexemeFlags.ControlConstruction,
             [")"] = LexemeFlags.ControlConstruction,
-            ["?"] = LexemeFlags.Operator,
-            [":"] = LexemeFlags.Operator,
+            ["["] = LexemeFlags.ControlConstruction,
+            ["]"] = LexemeFlags.ControlConstruction,
             ["if"] = LexemeFlags.Reserved,
-            ["else"] = LexemeFlags.Reserved,
             ["then"] = LexemeFlags.Reserved,
             ["while"] = LexemeFlags.Reserved,
-            ["do"] = LexemeFlags.Reserved,
             ["for"] = LexemeFlags.Reserved,
             ["="] = LexemeFlags.Operator,
             ["read"] = LexemeFlags.Reserved,

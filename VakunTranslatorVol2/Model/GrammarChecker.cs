@@ -2,138 +2,133 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.Model
 {
     public class GrammarChecker
     {
-        private Dictionary<string, string[][]> map = new Dictionary<string, string[][]>();
+        public string[,] PrecedenceTable { get; private set; }
+        public Dictionary<string, string[][]> Map { get; private set; }
         public string[,] Check(string grammar)
         {
-            map = BuildMap(grammar);
+            Map = BuildMap(grammar);
             var terminals = GetTerminals();
 
             CheckForUndefinedTerminals();
 
             var lexemesMap = BuildLexemesMap(terminals);
-            var precedenceTable = BuildPrecedenceTable(lexemesMap);
+            PrecedenceTable = BuildPrecedenceTable(lexemesMap);
             var firstMap = GetFirstMap(lexemesMap);
             var lastMap = GetLastMap(lexemesMap);
 
-            FillEquals(precedenceTable, lexemesMap);
-            FillLess(precedenceTable, lexemesMap, firstMap);
-            FillMore(precedenceTable, lexemesMap, firstMap, lastMap);
-            FillSharp(precedenceTable);
-            FillEmpties(precedenceTable);
+            FillEquals(lexemesMap);
+            FillLess(lexemesMap, firstMap);
+            FillMore(lexemesMap, firstMap, lastMap);
+            FillSharp();
+            FillEmpties();
 
-            return precedenceTable;
+            return PrecedenceTable;
         }
 
-        private void FillEmpties(string[,] precedenceTable)
+        private void FillEmpties()
         {
-            for(int i = 0; i < precedenceTable.GetLength(0); i++)
+            for(int i = 0; i < PrecedenceTable.GetLength(0); i++)
             {
-                for(int j = 0; j < precedenceTable.GetLength(1); j++)
+                for(int j = 0; j < PrecedenceTable.GetLength(1); j++)
                 {
-                    if(string.IsNullOrEmpty(precedenceTable[i, j]))
+                    if(string.IsNullOrEmpty(PrecedenceTable[i, j]))
                     {
-                        precedenceTable[i, j] = "-";
+                        PrecedenceTable[i, j] = "-";
                     }
                 }
             }
         }
-        private void FillSharp(string[,] precedenceTable)
+        private void FillSharp()
         {
-            var length = precedenceTable.GetLength(0) - 1;
+            var length = PrecedenceTable.GetLength(0) - 1;
             for(int i = 1; i < length; i++)
             {
-                precedenceTable[length, i] = "<";
-                precedenceTable[i, length] = ">";
+                PrecedenceTable[length, i] = "<";
+                PrecedenceTable[i, length] = ">";
             }
         }
-        private void FillMore(string[,] precedenceTable, List<string> lexemesMap, Dictionary<string, string[]> firstMap, Dictionary<string, string[]> lastMap)
+        private void FillMore(List<string> lexemesMap, Dictionary<string, string[]> firstMap, Dictionary<string, string[]> lastMap)
         {
-            for(int i = 1; i < precedenceTable.GetLength(0); i++)
+            for(int i = 1; i < PrecedenceTable.GetLength(0); i++)
             {
-                for(int j = 1; j < precedenceTable.GetLength(1); j++)
+                for(int j = 1; j < PrecedenceTable.GetLength(1); j++)
                 {
-                    if("=".Equals(precedenceTable[i, j]) && lastMap.ContainsKey(precedenceTable[i, 0]))
+                    if(PrecedenceTable[i, j] == "=" && lastMap.ContainsKey(PrecedenceTable[i, 0]))
                     {
-                        if(IsNonTerminal(precedenceTable[0, j]))
+                        if(IsNonTerminal(PrecedenceTable[0, j]))
                         {
-                            foreach(var lexeme in lastMap[precedenceTable[i, 0]])
+                            foreach(var lexeme in lastMap[PrecedenceTable[i, 0]])
                             {
-                                foreach(var lexemeS in firstMap[precedenceTable[0, j]])
+                                foreach(var lexemeS in firstMap[PrecedenceTable[0, j]])
                                 {
                                     var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
                                     var lexemeSPosition = lexemesMap.IndexOf(lexemeS) + 1;
 
-                                    if(string.IsNullOrEmpty(precedenceTable[lexemePosition, lexemeSPosition]) || ">".Equals(precedenceTable[lexemePosition, lexemeSPosition]))
+                                    if(string.IsNullOrEmpty(PrecedenceTable[lexemePosition, lexemeSPosition]) || PrecedenceTable[lexemePosition, lexemeSPosition] == ">")
                                     {
-                                        precedenceTable[lexemePosition, lexemeSPosition] = ">";
+                                        PrecedenceTable[lexemePosition, lexemeSPosition] = ">";
                                     }
                                     else
                                     {
-                                        throw new ArgumentException($"Конфлікт >. Відношення ({precedenceTable[lexemePosition, 0]} i {precedenceTable[0, lexemeSPosition]}) уже існує {precedenceTable[lexemePosition, j]}");
+                                        throw new ArgumentException($"Конфлікт >. Відношення ({PrecedenceTable[lexemePosition, 0]} i {PrecedenceTable[0, lexemeSPosition]}) уже існує {PrecedenceTable[lexemePosition, j]}");
                                     }
                                 }
                             }
                         }
-                        else
+                        foreach(var lexeme in lastMap[PrecedenceTable[i, 0]])
                         {
-                            foreach(var lexeme in lastMap[precedenceTable[i, 0]])
+                            var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
+                            if(string.IsNullOrEmpty(PrecedenceTable[lexemePosition, j]) || ">".Equals(PrecedenceTable[lexemePosition, j]))
                             {
-                                var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
-                                if(string.IsNullOrEmpty(precedenceTable[lexemePosition, j]) || ">".Equals(precedenceTable[lexemePosition, j]))
-                                {
-                                    precedenceTable[lexemePosition, j] = ">";
-                                }
-                                else
-                                {
-                                    throw new ArgumentException($"Конфлікт >. Відношення ({precedenceTable[lexemePosition, 0]} i {precedenceTable[0, j]}) уже існує {precedenceTable[lexemePosition, j]}");
-                                }
+                                PrecedenceTable[lexemePosition, j] = ">";
+                            }
+                            else
+                            {
+                                throw new ArgumentException($"Конфлікт >. Відношення ({PrecedenceTable[lexemePosition, 0]} i {PrecedenceTable[0, j]}) уже існує {PrecedenceTable[lexemePosition, j]}");
                             }
                         }
                     }
                 }
             }
         }
-        private void FillLess(string[,] precedenceTable, List<string> lexemesMap, Dictionary<string, string[]> firstMap)
+        private void FillLess(List<string> lexemesMap, Dictionary<string, string[]> firstMap)
         {
-            for(int i = 1; i < precedenceTable.GetLength(0); i++)
+            for(int i = 1; i < PrecedenceTable.GetLength(0); i++)
             {
-                for(int j = 1; j < precedenceTable.GetLength(1); j++)
+                for(int j = 1; j < PrecedenceTable.GetLength(1); j++)
                 {
-                    if("=".Equals(precedenceTable[i, j]))
+                    if(PrecedenceTable[i, j] == "=" && firstMap.ContainsKey(PrecedenceTable[0, j]))
                     {
-                        if(firstMap.ContainsKey(precedenceTable[0, j]))
+                        foreach(var lexeme in firstMap[PrecedenceTable[0, j]])
                         {
-                            foreach(var lexeme in firstMap[precedenceTable[0, j]])
-                            {
-                                var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
+                            var lexemePosition = lexemesMap.IndexOf(lexeme) + 1;
 
-                                if(string.IsNullOrEmpty(precedenceTable[i, lexemePosition]) || "<".Equals(precedenceTable[i, lexemePosition]))
-                                {
-                                    precedenceTable[i, lexemePosition] = "<";
-                                }
-                                else
-                                {
-                                    throw new ArgumentException($"Конфлікт <. Відношення ({precedenceTable[i, 0]} i { precedenceTable[0, lexemePosition] }) уже існує {precedenceTable[i, lexemePosition]}");
-                                }
+                            if(string.IsNullOrEmpty(PrecedenceTable[i, lexemePosition]) || PrecedenceTable[i, lexemePosition] == "<")
+                            {
+                                PrecedenceTable[i, lexemePosition] = "<";
+                            }
+                            else
+                            {
+                                throw new ArgumentException($"Конфлікт <. Відношення ({PrecedenceTable[i, 0]} i { PrecedenceTable[0, lexemePosition] }) уже існує {PrecedenceTable[i, lexemePosition]}");
                             }
                         }
                     }
                 }
             }
         }
-        private void FillEquals(string[,] precedenceTable, List<string> lexemesMap)
+        private void FillEquals(List<string> lexemesMap)
         {
-            foreach(var line in map.Values)
+            foreach(var line in Map.Values)
             {
                 foreach(var lexemes in line)
                 {
                     for(int i = 0; i < lexemes.Length - 1; i++)
                     {
-                        precedenceTable[lexemesMap.IndexOf(lexemes[i]) + 1, lexemesMap.IndexOf(lexemes[i + 1]) + 1] = "=";
+                        PrecedenceTable[lexemesMap.IndexOf(lexemes[i]) + 1, lexemesMap.IndexOf(lexemes[i + 1]) + 1] = "=";
                     }
                 }
             }
@@ -150,7 +145,7 @@ namespace VakunTranslatorVol2
             {
                 string lexeme = queue.Pop();
 
-                foreach(var line in map[lexeme])
+                foreach(var line in Map[lexeme])
                 {
                     var item = selector(line);
                     if(!result.Contains(item))
@@ -203,7 +198,7 @@ namespace VakunTranslatorVol2
         }
         private List<string> BuildLexemesMap(string[] terminals)
         {
-            return map.Keys
+            return Map.Keys
                 .Union(terminals)
                 .Union(new[] { "#" })
                 .ToList();
@@ -216,7 +211,7 @@ namespace VakunTranslatorVol2
                     .Select(x => new
                     {
                         Head = x.First(),
-                        Tail = x.Last().Split('|')
+                        Tail = x.Last().Split('#')
                     })
                     .Select(x => new
                     {
@@ -228,10 +223,10 @@ namespace VakunTranslatorVol2
 
         private string[] GetTerminals()
         {
-            return map.Values
+            return Map.Values
                 .SelectMany(x => x)
                 .SelectMany(x => x)
-                .Union(map.Keys)
+                .Union(Map.Keys)
                 .Where(x => !IsNonTerminal(x))
                 .Distinct()
                 .ToArray();
@@ -239,10 +234,10 @@ namespace VakunTranslatorVol2
 
         private void CheckForUndefinedTerminals()
         {
-            var unknownWord = map
+            var unknownWord = Map
                         .SelectMany(x => x.Value)
                         .SelectMany(x => x)
-                        .FirstOrDefault(x => !map.ContainsKey(x) && IsNonTerminal(x));
+                        .FirstOrDefault(x => !Map.ContainsKey(x) && IsNonTerminal(x));
 
             if(!string.IsNullOrEmpty(unknownWord))
             {

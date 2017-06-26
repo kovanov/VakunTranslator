@@ -1,6 +1,6 @@
-﻿namespace VakunTranslatorVol2
+﻿namespace VakunTranslatorVol2.Views
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Обязательная переменная конструктора.
@@ -39,11 +39,13 @@
             this.dEBUGToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lexicalAnlyzerOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pDAAnalyzerOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.checkGrammarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ascendingAnalyzerOutputToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.polizToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.rUNToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sourceBox = new System.Windows.Forms.RichTextBox();
             this.console = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
@@ -72,7 +74,8 @@
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fILEToolStripMenuItem,
             this.dEBUGToolStripMenuItem,
-            this.toolStripMenuItem1});
+            this.toolStripMenuItem1,
+            this.rUNToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(0, 2, 0, 2);
@@ -146,7 +149,8 @@
             this.dEBUGToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.lexicalAnlyzerOutputToolStripMenuItem,
             this.pDAAnalyzerOutputToolStripMenuItem,
-            this.checkGrammarToolStripMenuItem});
+            this.ascendingAnalyzerOutputToolStripMenuItem,
+            this.polizToolStripMenuItem});
             this.dEBUGToolStripMenuItem.Font = new System.Drawing.Font("Calibri", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.dEBUGToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
             this.dEBUGToolStripMenuItem.Name = "dEBUGToolStripMenuItem";
@@ -158,8 +162,8 @@
             this.lexicalAnlyzerOutputToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
             this.lexicalAnlyzerOutputToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(100)))), ((int)(((byte)(0)))));
             this.lexicalAnlyzerOutputToolStripMenuItem.Name = "lexicalAnlyzerOutputToolStripMenuItem";
-            this.lexicalAnlyzerOutputToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.D)));
-            this.lexicalAnlyzerOutputToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.lexicalAnlyzerOutputToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.L)));
+            this.lexicalAnlyzerOutputToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
             this.lexicalAnlyzerOutputToolStripMenuItem.Text = "Lexical Anlyzer Output";
             this.lexicalAnlyzerOutputToolStripMenuItem.Click += new System.EventHandler(this.lexicalAnlyzerOutputToolStripMenuItem_Click);
             // 
@@ -168,19 +172,44 @@
             this.pDAAnalyzerOutputToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
             this.pDAAnalyzerOutputToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(100)))), ((int)(((byte)(0)))));
             this.pDAAnalyzerOutputToolStripMenuItem.Name = "pDAAnalyzerOutputToolStripMenuItem";
-            this.pDAAnalyzerOutputToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.pDAAnalyzerOutputToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
+            this.pDAAnalyzerOutputToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.P)));
+            this.pDAAnalyzerOutputToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
             this.pDAAnalyzerOutputToolStripMenuItem.Text = "PDA Analyzer Output";
             this.pDAAnalyzerOutputToolStripMenuItem.Click += new System.EventHandler(this.pDAAnalyzerOutputToolStripMenuItem_Click);
             // 
-            // checkGrammarToolStripMenuItem
+            // ascendingAnalyzerOutputToolStripMenuItem
             // 
-            this.checkGrammarToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
-            this.checkGrammarToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(100)))), ((int)(((byte)(0)))));
-            this.checkGrammarToolStripMenuItem.Name = "checkGrammarToolStripMenuItem";
-            this.checkGrammarToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
-            this.checkGrammarToolStripMenuItem.Size = new System.Drawing.Size(223, 22);
-            this.checkGrammarToolStripMenuItem.Text = "CheckGrammar";
+            this.ascendingAnalyzerOutputToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.ascendingAnalyzerOutputToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(100)))), ((int)(((byte)(0)))));
+            this.ascendingAnalyzerOutputToolStripMenuItem.Name = "ascendingAnalyzerOutputToolStripMenuItem";
+            this.ascendingAnalyzerOutputToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.A)));
+            this.ascendingAnalyzerOutputToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.ascendingAnalyzerOutputToolStripMenuItem.Text = "Ascending Analyzer Output";
+            this.ascendingAnalyzerOutputToolStripMenuItem.Click += new System.EventHandler(this.ascendingAnalyzerOutputToolStripMenuItem_Click);
+            // 
+            // polizToolStripMenuItem
+            // 
+            this.polizToolStripMenuItem.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(50)))), ((int)(((byte)(50)))), ((int)(((byte)(50)))));
+            this.polizToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(200)))), ((int)(((byte)(100)))), ((int)(((byte)(0)))));
+            this.polizToolStripMenuItem.Name = "polizToolStripMenuItem";
+            this.polizToolStripMenuItem.Size = new System.Drawing.Size(241, 22);
+            this.polizToolStripMenuItem.Text = "Poliz";
+            this.polizToolStripMenuItem.Click += new System.EventHandler(this.polizToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(120, 20);
+            this.toolStripMenuItem1.Text = "CHECK GRAMMAR";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
+            // rUNToolStripMenuItem
+            // 
+            this.rUNToolStripMenuItem.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
+            this.rUNToolStripMenuItem.Name = "rUNToolStripMenuItem";
+            this.rUNToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
+            this.rUNToolStripMenuItem.Text = "RUN";
             // 
             // sourceBox
             // 
@@ -225,15 +254,7 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(387, 284);
             this.tableLayoutPanel1.TabIndex = 15;
             // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(100)))), ((int)(((byte)(100)))));
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(120, 20);
-            this.toolStripMenuItem1.Text = "CHECK GRAMMAR";
-            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
-            // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -244,7 +265,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.Text = "Form1";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -270,7 +291,9 @@
         private System.Windows.Forms.TextBox console;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ToolStripMenuItem pDAAnalyzerOutputToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem checkGrammarToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem ascendingAnalyzerOutputToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem rUNToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem polizToolStripMenuItem;
     }
 }

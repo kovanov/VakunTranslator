@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using VakunTranslatorVol2.Extensions;
-using static VakunTranslatorVol2.LexemeCodes;
+using static VakunTranslatorVol2.Model.LexemeCodes;
 
-namespace VakunTranslatorVol2.Analyzers
+namespace VakunTranslatorVol2.Model.Analyzers
 {
-    public class RecursiveSyntaxAnalyzer : ISyntaxAnalyzer
+    public class RecursiveSyntaxAnalyzer : SyntaxAnalyzer
     {
-        public List<string> Errors { get; private set; } = new List<string>();
         private Lexeme CurrentLexeme
         {
             get { return lexemes[currentIndex]; }
-        }
-        public bool HasErrors
-        {
-            get { return Errors.Any(); }
         }
 
         public RecursiveSyntaxAnalyzer()
@@ -26,7 +21,7 @@ namespace VakunTranslatorVol2.Analyzers
             Train<LexemeCodes>.OnSuccess = Errors.Clear;
         }
 
-        public void Analyze(List<Lexeme> lexemes)
+        public override void Analyze(List<Lexeme> lexemes)
         {
             this.lexemes = lexemes;
 
@@ -39,7 +34,7 @@ namespace VakunTranslatorVol2.Analyzers
                 Errors.Add(e.Message);
             }
         }
-        public void Dispose()
+        public override void Dispose()
         {
             currentIndex = 0;
             Errors.Clear();
@@ -63,8 +58,8 @@ namespace VakunTranslatorVol2.Analyzers
         private bool Command()
         {
             return (Train[INT, FLOAT][ID]["command"] && (Train[COMMA][ID]["command"].Repeat())) ||
-                    (Train[LABEL][ID]["label declaration"]) ||
-                    (Train[GOTO][ID]["goto operator"]) ||
+                    (Train[LABEL][LABEL_ID]["label declaration"]) ||
+                    (Train[GOTO][LABEL_ID]["goto operator"]) ||
                     (Train[ID][ASSIGN][Expression]["assignment"]) ||
                     (Train[WRITE][LEFT_PARENTHESIS][IdList][RIGHT_PARENTHESIS]["output"]) ||
                     (Train[READ][LEFT_PARENTHESIS][ID][RIGHT_PARENTHESIS]["input"]) ||
@@ -219,7 +214,7 @@ namespace VakunTranslatorVol2.Analyzers
 
         public Train()
         {
-            this.predicates = new List<Func<bool>>();
+            predicates = new List<Func<bool>>();
         }
 
         private string errorMsg;

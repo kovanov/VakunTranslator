@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using VakunTranslatorVol2.Extensions;
 
-namespace VakunTranslatorVol2.Modes
+namespace VakunTranslatorVol2.Model.Modes
 {
     public class Mode
     {
@@ -121,7 +121,7 @@ namespace VakunTranslatorVol2.Modes
             }
 
             var next = this[NextModes].FirstOrDefault(x => x.StartsWith(c));
-            if(next.IsNotNull())
+            if(next != null)
             {
                 Buffer += c;
                 return next;
@@ -146,10 +146,7 @@ namespace VakunTranslatorVol2.Modes
 
         protected IEnumerable<Mode> this[params int[] modeNumbers]
         {
-            get
-            {
-                return Modes.Where(x => modeNumbers.Contains(x.ID));
-            }
+            get { return Modes.Where(x => modeNumbers.Contains(x.ID)); }
         }
         protected void OnNewLine()
         {

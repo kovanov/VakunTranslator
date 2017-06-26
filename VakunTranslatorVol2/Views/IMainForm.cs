@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using VakunTranslatorVol2.Analyzers;
+using VakunTranslatorVol2.CodeHighlight;
+using VakunTranslatorVol2.Model;
+using VakunTranslatorVol2.Model.Analyzers;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.Views
 {
-    public interface IView
+    public interface IMainForm
     {
         event Action<string> SourceCodeAnalyzeRequired;
         event Action<string> SaveFileAsClick;
@@ -13,6 +14,7 @@ namespace VakunTranslatorVol2
         event Action OpenSourceCodeFileClick;
         event Action GrammarAnalyzeRequired;
         event Action NewFileClick;
+        event Action BuildRequired;
 
         void WriteConsole(string message);
         void DisplayConstants<T>(IEnumerable<T> source);
@@ -23,10 +25,14 @@ namespace VakunTranslatorVol2
         void SetSourceCode(string text);
         void ClearConsole();
         void HideConsole();
-        void SetPDAOutput(List<PDASyntaxAnalyzer.UsedRule> obj);
+        void SetPDAOutput(List<PDASyntaxAnalyzer.UsedRule> rules);
         void ShowConsole();
         void HighlightSourceCode(IEnumerable<Lexeme> lexemes);
         void ShowGrammarError(string message);
         void ShowGrammarTable(string[,] table);
+        void SetAAOutput(List<AscendingSyntaxAnalyzer.AscendingInfo> info);
+        void RunProgram(List<string> poliz);
+        void EnableRunButton();
+        void DisableRunButton();
     }
 }

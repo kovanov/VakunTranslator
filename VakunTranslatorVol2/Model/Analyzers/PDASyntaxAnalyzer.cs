@@ -1,18 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using static VakunTranslatorVol2.LexemeCodes;
+using static VakunTranslatorVol2.Model.LexemeCodes;
 
-namespace VakunTranslatorVol2.Analyzers
+namespace VakunTranslatorVol2.Model.Analyzers
 {
-    public class PDASyntaxAnalyzer : ISyntaxAnalyzer
+    public class PDASyntaxAnalyzer : SyntaxAnalyzer
     {
-        public List<string> Errors { get; } = new List<string>();
-        public bool HasErrors
-        {
-            get { return Errors.Any(); }
-        }
-
         private static Stack<int> bubbleStack = new Stack<int>();
         private List<UsedRule> usedRules = new List<UsedRule>();
         private Action<List<UsedRule>> onReady;
@@ -21,7 +15,7 @@ namespace VakunTranslatorVol2.Analyzers
         {
             this.onReady = onReady;
         }
-        public void Analyze(List<Lexeme> lexemes)
+        public override void Analyze(List<Lexeme> lexemes)
         {
             var currentAlpha = 1;
             foreach(var lexeme in lexemes)
@@ -95,7 +89,10 @@ namespace VakunTranslatorVol2.Analyzers
             }
 
 
-            var numbers = faultString.Split().Select(int.Parse).ToArray();
+            var numbers = faultString
+                            .Split()
+                            .Select(int.Parse)
+                            .ToArray();
 
             var newAlpha = numbers.First();
             var stack = numbers.Last();
@@ -105,7 +102,7 @@ namespace VakunTranslatorVol2.Analyzers
             return newAlpha;
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             bubbleStack.Clear();
             Errors.Clear();
@@ -127,12 +124,12 @@ namespace VakunTranslatorVol2.Analyzers
             new PDARule { Alpha = 6,    LexemeCode = ID,                 Beta = 18,                                                                         },
             new PDARule { Alpha = 6,    LexemeCode = FOR,                Beta = 20,                                                                         },
             new PDARule { Alpha = 6,    LexemeCode = IF,                 Beta = 37, Stack = 31,                                                             },
-            new PDARule { Alpha = 6,    LexemeCode = GOTO,               Beta = 33,                                                                         },
+            new PDARule { Alpha = 6,    LexemeCode = GOTO,               Beta = 10,                                                                         },
             new PDARule { Alpha = 7,    LexemeCode = ID,                 Beta = 8,                                                                          },
             new PDARule { Alpha = 8,    LexemeCode = COMMA,              Beta = 41,             OnComparisionFault = "exit"                                 },
             new PDARule { Alpha = 8,    LexemeCode = ASSIGN,             Beta = 34,             OnComparisionFault = "exit"                                 },
             new PDARule { Alpha = 9,    LexemeCode = NOTHING,                                   OnComparisionFault = "exit"                                 },
-            new PDARule { Alpha = 10,   LexemeCode = ID,                                                                    OnComparisionSuccess = "exit"   },
+            new PDARule { Alpha = 10,   LexemeCode = LABEL_ID,                                                                    OnComparisionSuccess = "exit"   },
             new PDARule { Alpha = 12,   LexemeCode = LEFT_PARENTHESIS,   Beta = 13,                                                                         },
             new PDARule { Alpha = 13,   LexemeCode = ID,                 Beta = 14,                                                                         },
             new PDARule { Alpha = 14,   LexemeCode = COMMA,              Beta = 13,                                                                         },
@@ -146,14 +143,15 @@ namespace VakunTranslatorVol2.Analyzers
             new PDARule { Alpha = 21,   LexemeCode = ASSIGN,             Beta = 34, Stack = 22                                                              },
             new PDARule { Alpha = 22,   LexemeCode = TO,                 Beta = 34, Stack = 23                                                              },
             new PDARule { Alpha = 23,   LexemeCode = BY,                 Beta = 34, Stack = 24                                                              },
-            new PDARule { Alpha = 24,   LexemeCode = WHILE,              Beta = 25,                                                                         },
+            new PDARule { Alpha = 24,   LexemeCode = WHILE,              Beta = 30,                                                                         },
             new PDARule { Alpha = 25,   LexemeCode = LEFT_PARENTHESIS,   Beta = 37, Stack = 27                                                              },
             new PDARule { Alpha = 26,   LexemeCode = NOTHING,                                                                                               },
             new PDARule { Alpha = 27,   LexemeCode = RIGHT_PARENTHESIS,  Beta = 6,  Stack = 28                                                              },
             new PDARule { Alpha = 28,   LexemeCode = SEMICOLON,          Beta = 29,                                                                         },
             new PDARule { Alpha = 29,   LexemeCode = END,                                       OnComparisionFault = "6 28", OnComparisionSuccess = "exit"  },
+            new PDARule { Alpha = 30,   LexemeCode = LEFT_BRACKET,       Beta = 37, Stack = 32                                                              },
             new PDARule { Alpha = 31,   LexemeCode = THEN,               Beta = 6,  Stack = 19                                                              },
-            new PDARule { Alpha = 33,   LexemeCode = ID,                                        OnComparisionSuccess = "exit"                               },
+            new PDARule { Alpha = 32,   LexemeCode = RIGHT_BRACKET,      Beta = 6,  Stack = 28                                                              },
             new PDARule { Alpha = 34,   LexemeCode = ID,                 Beta = 36,                                                                         },
             new PDARule { Alpha = 34,   LexemeCode = CONSTANT,           Beta = 36,                                                                         },
             new PDARule { Alpha = 34,   LexemeCode = LEFT_PARENTHESIS,   Beta = 34, Stack = 35                                                              },

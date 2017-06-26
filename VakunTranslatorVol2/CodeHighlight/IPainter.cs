@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.CodeHighlight
 {
     public interface IPainter<T>
     {

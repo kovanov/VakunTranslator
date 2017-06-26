@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.Views
 {
-    public partial class AnalyzerWindow : Form
+    public partial class LexicalAnalyzerForm : Form
     {
         public event Action<string, int> LexemSelected;
-        public AnalyzerWindow()
+        public LexicalAnalyzerForm()
         {
             InitializeComponent();
         }

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace VakunTranslatorVol2
+namespace VakunTranslatorVol2.CodeHighlight
 {
     public class Colorizer<T>
     {
