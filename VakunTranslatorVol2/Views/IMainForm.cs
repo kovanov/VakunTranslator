@@ -34,5 +34,6 @@ namespace VakunTranslatorVol2.Views
         void RunProgram(List<string> poliz);
         void EnableRunButton();
         void DisableRunButton();
+        void SetPoliz(List<string> poliz);
     }
 }

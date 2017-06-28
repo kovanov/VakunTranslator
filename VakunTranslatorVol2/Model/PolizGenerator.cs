@@ -9,16 +9,18 @@ namespace VakunTranslatorVol2.Model
 {
     public class PolizGenerator
     {
+        public List<string> Poliz { get; private set; }
+
         private Stack<List<string>> _stack;
         private ILexicalAnalyzer _lexicalAnalyzer;
         private List<string> _labels;
         private List<Lexeme> _lexems;
-        private List<string> _poliz;
         private List<string> _loopTempVars;
 
         public PolizGenerator(ILexicalAnalyzer lexicalAnalyzer)
         {
             _lexicalAnalyzer = lexicalAnalyzer;
+            Poliz = new List<string>();
         }
 
         public List<string> MakePoliz()
@@ -26,7 +28,7 @@ namespace VakunTranslatorVol2.Model
             _labels = new List<string>();
             _stack = new Stack<List<string>>();
             _loopTempVars = new List<string>();
-            _poliz = new List<string>();
+            Poliz = new List<string>();
             _lexems = _lexicalAnalyzer.AllLexemes.ToList(); //я не тупой, мне просто нужен новый список
 
             _lexems.RemoveRange(0, 3);
@@ -52,7 +54,7 @@ namespace VakunTranslatorVol2.Model
                 ParseExpression();
             }
 
-            return _poliz;
+            return Poliz;
         }
 
         private void ParseExpression()
@@ -87,7 +89,7 @@ namespace VakunTranslatorVol2.Model
             _stack.Push(new List<string> { _lexems[0].Body });
             _lexems.RemoveAt(0);
             var loopVar = _lexems[0];
-            _poliz.Add(_lexems[0].Body);
+            Poliz.Add(_lexems[0].Body);
             _lexems.RemoveAt(0);
             _stack.Push(new List<string> { _lexems[0].Body });
             _lexems.RemoveAt(0);
@@ -98,34 +100,34 @@ namespace VakunTranslatorVol2.Model
 
             #region to
             _labels.Add(loopLabels.M0);
-            _poliz.Add($"{loopLabels.M0}:");
+            Poliz.Add($"{loopLabels.M0}:");
             _loopTempVars.Add(loopVars.R0);
-            _poliz.Add(loopVars.R0);
+            Poliz.Add(loopVars.R0);
 
             DeicstraUntil(BY);
 
-            _poliz.Add("=");
+            Poliz.Add("=");
 
             #endregion
 
             #region by
             _loopTempVars.Add(loopVars.R1);
-            _poliz.Add(loopVars.R1);
+            Poliz.Add(loopVars.R1);
 
             DeicstraUntil(WHILE);
 
-            _poliz.Add("=");
+            Poliz.Add("=");
 
             #endregion
 
             _lexems.RemoveAt(0);
 
             DeicstraUntil(RIGHT_BRACKET);
-            _poliz.AddRange(new[] { loopVar.Body, loopVars.R0, "-", "0", "<=", "&" });
+            Poliz.AddRange(new[] { loopVar.Body, loopVars.R0, "-", loopVars.R1, "*" , "0", "<=", "&" });
 
             _labels.Add(loopLabels.M1);
-            _poliz.Add(loopLabels.M1);
-            _poliz.Add("УПЛ");
+            Poliz.Add(loopLabels.M1);
+            Poliz.Add("УПЛ");
 
             while (!_lexems[0].Is(END))
             {
@@ -134,10 +136,10 @@ namespace VakunTranslatorVol2.Model
 
             _lexems.RemoveAt(0);
             _lexems.RemoveAt(0);
-            _poliz.AddRange(new[] { loopVar.Body, loopVar.Body, loopVars.R1, "+", "=" });
-            _poliz.Add(loopLabels.M0);
-            _poliz.Add("БП");
-            _poliz.Add($"{loopLabels.M1}:");
+            Poliz.AddRange(new[] { loopVar.Body, loopVar.Body, loopVars.R1, "+", "=" });
+            Poliz.Add(loopLabels.M0);
+            Poliz.Add("БП");
+            Poliz.Add($"{loopLabels.M1}:");
             _stack.Pop();
 
             void DeicstraUntil(LexemeCodes code)
@@ -149,18 +151,23 @@ namespace VakunTranslatorVol2.Model
 
                 while (_stack.Any() && GetOperatorPrioretet(_stack.Peek()[0]) >= GetOperatorPrioretet(_lexems[0].Body))
                 {
-                    _poliz.Add(_stack.Pop()[0]);
+                    Poliz.Add(_stack.Pop()[0]);
                 }
 
                 _lexems.RemoveAt(0);
             }
         }
 
+        public void Clear()
+        {
+            Poliz.Clear();
+        }
+
         private void ParseGoto()
         {
             _lexems.RemoveAt(0);
-            _poliz.Add($"m{{{_lexems[0].Body}}}");
-            _poliz.Add("БП");
+            Poliz.Add($"m{{{_lexems[0].Body}}}");
+            Poliz.Add("БП");
             _lexems.RemoveAt(0);
             _lexems.RemoveAt(0);
         }
@@ -169,7 +176,7 @@ namespace VakunTranslatorVol2.Model
         {
             _lexems.RemoveAt(0);
             _labels.Add($"m{{{_lexems[0].Body}}}:");
-            _poliz.Add(_labels.Last());
+            Poliz.Add(_labels.Last());
             _lexems.RemoveAt(0);
             _lexems.RemoveAt(0);
         }
@@ -187,23 +194,23 @@ namespace VakunTranslatorVol2.Model
 
             while (_stack.Peek()[0] != "if")
             {
-                _poliz.Add(_stack.Pop()[0]);
+                Poliz.Add(_stack.Pop()[0]);
             }
 
             _lexems.RemoveAt(0);
             _labels.Add(ifLabel);
             _stack.Push(new List<string>() { _stack.Pop()[0], _labels.Last() });
-            _poliz.Add(ifLabel);
-            _poliz.Add("УПЛ");
+            Poliz.Add(ifLabel);
+            Poliz.Add("УПЛ");
 
             ParseExpression();
 
             while (!_stack.Peek()[0].Equals("if"))
             {
-                _poliz.Add(_stack.Pop()[0]);
+                Poliz.Add(_stack.Pop()[0]);
             }
 
-            _poliz.Add($"{ifLabel}:");
+            Poliz.Add($"{ifLabel}:");
 
             _stack.Pop();
         }
@@ -216,8 +223,8 @@ namespace VakunTranslatorVol2.Model
             {
                 if (_lexems[0].Is(ID))
                 {
-                    _poliz.Add(_lexems[0].Body);
-                    _poliz.Add(@operator.Body);
+                    Poliz.Add(_lexems[0].Body);
+                    Poliz.Add(@operator.Body);
                 }
                 _lexems.RemoveAt(0);
             }
@@ -227,7 +234,7 @@ namespace VakunTranslatorVol2.Model
 
         private void ParseAssign()
         {
-            _poliz.Add(_lexems[0].Body);
+            Poliz.Add(_lexems[0].Body);
             _lexems.RemoveAt(0);
             _stack.Push(new List<string> { _lexems[0].Body });
             _lexems.RemoveAt(0);
@@ -239,7 +246,7 @@ namespace VakunTranslatorVol2.Model
 
             while (_stack.Any() && GetOperatorPrioretet(_stack.Peek()[0]) >= GetOperatorPrioretet(_lexems[0].Body))
             {
-                _poliz.Add(_stack.Pop()[0]);
+                Poliz.Add(_stack.Pop()[0]);
             }
 
             _lexems.RemoveAt(0);
@@ -255,7 +262,7 @@ namespace VakunTranslatorVol2.Model
         {
             if (_lexems[0].Is(CONSTANT) || _lexems[0].Is(ID))
             {
-                _poliz.Add(_lexems[0].Body);
+                Poliz.Add(_lexems[0].Body);
                 _lexems.RemoveAt(0);
             }
             else
@@ -269,7 +276,7 @@ namespace VakunTranslatorVol2.Model
                 {
                     while (!new[] { "(", "[" }.Contains(_stack.Peek()[0]))
                     {
-                        _poliz.Add(_stack.Pop()[0]);
+                        Poliz.Add(_stack.Pop()[0]);
                     }
 
                     _stack.Pop();
@@ -282,7 +289,7 @@ namespace VakunTranslatorVol2.Model
                     {
                         if (!(_lexems[0].Is(FOR) || _lexems[0].Is(IF)))
                         {
-                            _poliz.Add(_stack.Pop()[0]);
+                            Poliz.Add(_stack.Pop()[0]);
                         }
                     }
                     if (GetOperatorPrioretet(_stack.Peek()[0]) < GetOperatorPrioretet(_lexems[0].Body))

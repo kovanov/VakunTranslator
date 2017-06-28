@@ -95,7 +95,6 @@ namespace VakunTranslatorVol2.Views
         }
         public void RunProgram(List<string> poliz)
         {
-            polizForm.SetPoliz(string.Join(" ", poliz));
             new ExecutingForm(poliz).ShowDialog();
         }
         public void EnableRunButton()
@@ -175,6 +174,11 @@ namespace VakunTranslatorVol2.Views
         private void DisabledRun_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Can't run program, see console", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public void SetPoliz(List<string> poliz)
+        {
+            polizForm.SetPoliz(string.Join(" ", poliz));
         }
 
         private const int CONSOLE_HEIGHT = 100;

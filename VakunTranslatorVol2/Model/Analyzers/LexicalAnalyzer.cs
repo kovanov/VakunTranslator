@@ -130,13 +130,13 @@ namespace VakunTranslatorVol2.Model.Analyzers
                 {
                     lexeme.Code = exsistingId.Code;
                 }
-                else if (AllLexemes.Count > 0 && AllLexemes.Last().Is(LexemeCodes.LABEL))
-                {
-                    lexeme.Code = (int)LexemeCodes.LABEL_ID;
-                }
                 else
                 {
                     AddTo(Identificators, lexeme);
+                    if (AllLexemes.Count > 0 && AllLexemes.Last().Is(LexemeCodes.LABEL))
+                    {
+                        lexeme.Code = (int)LexemeCodes.LABEL_ID;
+                    }
                 }
             }
 

@@ -11,8 +11,8 @@ namespace VakunTranslatorVol2
     public class Controller
     {
         private IMainForm view;
-        private ILexicalAnalyzer lexicalAnalyzer;
-        private ISyntaxAnalyzer syntaxAnalyzer;
+        private ILexicalAnalyzer _lexicalAnalyzer;
+        private ISyntaxAnalyzer _syntaxAnalyzer;
         private FileManager fileManager;
         private GrammarChecker grammarChecker;
         private PolizGenerator _polizGenerator;
@@ -34,15 +34,14 @@ namespace VakunTranslatorVol2
 
             fileManager = new FileManager();
 
-            lexicalAnalyzer = new LexicalAnalyzer();
-            syntaxAnalyzer = new PDASyntaxAnalyzer(view.SetPDAOutput);
-            _polizGenerator = new PolizGenerator(lexicalAnalyzer);
+            _lexicalAnalyzer = new LexicalAnalyzer();
+            _syntaxAnalyzer = new PDASyntaxAnalyzer(view.SetPDAOutput);
+            _polizGenerator = new PolizGenerator(_lexicalAnalyzer);
         }
 
         private void View_BuildRequired()
         {
-            _polizGenerator = new PolizGenerator(lexicalAnalyzer);
-            view.RunProgram(_polizGenerator.MakePoliz());
+            view.RunProgram(_polizGenerator.Poliz);
         }
 
         private void View_SaveFileClick(string text)
@@ -82,33 +81,41 @@ namespace VakunTranslatorVol2
         {
             view.EnableRunButton();
             view.HideConsole();
-            lexicalAnalyzer = new LexicalAnalyzer();
-            syntaxAnalyzer = new PDASyntaxAnalyzer(view.SetPDAOutput);
+            _lexicalAnalyzer = new LexicalAnalyzer();
+            _syntaxAnalyzer = new PDASyntaxAnalyzer(view.SetPDAOutput);
+            _polizGenerator = new PolizGenerator(_lexicalAnalyzer);
 
-            var lexemes = lexicalAnalyzer.Analyze(source);
+            var lexemes = _lexicalAnalyzer.Analyze(source);
 
             view.HighlightSourceCode(lexemes);
 
-            view.DisplayConstants(lexicalAnalyzer.Constants.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
-            view.DisplayIdentificators(lexicalAnalyzer.Identificators.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
+            view.DisplayConstants(_lexicalAnalyzer.Constants.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
+            view.DisplayIdentificators(_lexicalAnalyzer.Identificators.Select(x => new { Code = x.ConstCode, Body = x.Body, Type = x.Type }));
             view.DisplayLexemes(lexemes.Select(x => new { Body = x.Body, Type = x.Flags, Line = x.Line, Code = x.Code, ConstCode = x.ConstCode }));
 
-            if (lexicalAnalyzer.HasErrors)
+            if (_lexicalAnalyzer.HasErrors)
             {
-                ShowErrors(lexicalAnalyzer.Errors.Select(x=>$"Lexical error: {x}"));
+                ShowErrors(_lexicalAnalyzer.Errors.Select(x=>$"Lexical error: {x}"));
                 view.DisableRunButton();
+                _polizGenerator.Clear();
             }
             else
             {
                 view.EnableRunButton();
-                syntaxAnalyzer.Analyze(lexemes);
+                _syntaxAnalyzer.Analyze(lexemes);
 
-                if (syntaxAnalyzer.HasErrors)
+                if (_syntaxAnalyzer.HasErrors)
                 {
-                    ShowErrors(syntaxAnalyzer.Errors.Select(x => $"Syntax error: {x}"));
+                    ShowErrors(_syntaxAnalyzer.Errors.Select(x => $"Syntax error: {x}"));
                     view.DisableRunButton();
+                    _polizGenerator.Clear();
+                }
+                else
+                {
+                    _polizGenerator.MakePoliz();
                 }
             }
+            view.SetPoliz(_polizGenerator.Poliz);
         }
 
         private void ShowErrors(IEnumerable<string> errors)
